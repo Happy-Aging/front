@@ -1,0 +1,236 @@
+[
+  {
+    "questionNumber": "1",
+    "questionText": "응답자의 성별",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["남자", "여자"]
+  },
+  {
+    "questionNumber": "2",
+    "questionText": "어르신 몇 년생이신가요?",
+    "answerType": "NUMBER",
+    "options": [ ]
+  },
+  {
+    "questionNumber": "3",
+    "questionText": "현재 누구와 함께 사시나요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["혼자 살고 있음", "배우자", "자식", "기타"]
+  },
+  {
+    "questionNumber": "4",
+    "questionText": "살고 계신 집의 형태는 어떤 것인가요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["아파트/주상복합", "연립주택/다세대주택", "단독주택", "기타"]
+  },
+  {
+    "questionNumber": "5",
+    "questionText": "현재 살고 계신 집이나 주변 지역에 계단이나 비탈길이 많은가요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["그렇다", "아니다"]
+  },
+  {
+    "questionNumber": "6",
+    "questionText": "현재 노인장기요양등급 대상자인가요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["그렇다", "아니다"]
+  },
+  {
+    "questionNumber": "7-1",
+    "questionText": "가끔 보행 시 몸 움직임이 둔해지는 것을 느낀적이 있다.",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["그렇다", "아니다"]
+  },
+  {
+    "questionNumber": "7-2",
+    "questionText": "집 안에서 걸어다닐때, 가구를 잡아야 한다든지 몸을 기대어 의지해야 지탱할 수 있다.",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["그렇다", "아니다"]
+  },
+  {
+    "questionNumber": "7-3",
+    "questionText": "앉았다 일어설 때 의자나 방바닥을 짚고 손에 힘을 주어야만 한다",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["그렇다", "아니다"]
+  },
+  {
+    "questionNumber": "7-4",
+    "questionText": "모퉁이를 돌거나 걷는 방향을 바꾸려고 할때의 걸음걸이가 쉽지않다.",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["그렇다", "아니다"]
+  },
+  {
+    "questionNumber": "7-5",
+    "questionText": "지팡이나 실버카 등 보행기를 사용해야만 이동할 수 있다.",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["그렇다", "아니다"]
+  },
+  {
+    "questionNumber": "8-1",
+    "questionText": "백내장이 있나요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["있다", "없다"]
+  },
+  {
+    "questionNumber": "8-2",
+    "questionText": "녹내장이 있나요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["있다", "없다"]
+  },
+  {
+    "questionNumber": "8-3",
+    "questionText": "황반변성이 있나요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["있다", "없다"]
+  },
+  {
+    "questionNumber": "9-1",
+    "questionText": "고혈압이 있나요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["있다", "없다"]
+  },
+  {
+    "questionNumber": "9-2",
+    "questionText": "당뇨가 있나요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["있다", "없다"]
+  },
+  {
+    "questionNumber": "9-3",
+    "questionText": "관절염이 있나요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["있다", "없다"]
+  },
+  {
+    "questionNumber": "9-4",
+    "questionText": "심장질환(협심증, 동맥질환)이 있나요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["있다", "없다"]
+  },
+  {
+    "questionNumber": "9-5",
+    "questionText": "뇌질환(중풍, 뇌졸중)이 있나요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["있다", "없다"]
+  },
+  {
+    "questionNumber": "9-6",
+    "questionText": "골다공증이 있나요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["있다", "없다"]
+  },
+  {
+    "questionNumber": "9-7",
+    "questionText": "기립성 저혈압이 있나요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["있다", "없다"]
+  },
+  {
+    "questionNumber": "9-8",
+    "questionText": "파킨슨병이 있나요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["있다", "없다"]
+  },
+  {
+    "questionNumber": "10-1",
+    "questionText": "빈뇨(자주 소변이 마려움)증상이 있나요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["있다", "없다"]
+  },
+  {
+    "questionNumber": "10-2",
+    "questionText": "긴박뇨가 있나요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["있다", "없다"]
+  },
+  {
+    "questionNumber": "10-3",
+    "questionText": "자다가 일어나서 화장실에 자주 가시나요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["있다", "없다"]
+  },
+  {
+    "questionNumber": "10-4",
+    "questionText": "설사나 변비가 있으신가요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["있다", "없다"]
+  },
+  {
+    "questionNumber": "10-5",
+    "questionText": "잔변이 있어서 불편하신가요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["있다", "없다"]
+  },
+  {
+    "questionNumber": "11",
+    "questionText": "최근 1년 이내에 낙상(미끄러지거나 걸려 넘어지신)경험이 있으신가요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["없다", "1회", "2회", "3회", "4회", "5회 이상"]
+  },
+  {
+    "questionNumber": "12",
+    "questionText": "평소 30분 이상 운동을 얼마나 자주 하시나요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["주5회 이상", "주 2~3회", "주 1회 정도", "아주 가끔 생각날 때 한다", "거의 안 한다"]
+  },
+  {
+    "questionNumber": "13-1",
+    "questionText": "문턱이나 단차가 있어서 화장실 출입이 어려운가요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["그렇다", "아니다"]
+  },
+  {
+    "questionNumber": "13-2",
+    "questionText": "욕조나 샤워부스에 드나들기 어려운가요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["그렇다", "아니다"]
+  },
+  {
+    "questionNumber": "13-3",
+    "questionText": "변기에 앉고 설 때 지지대가 필요한가요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["그렇다", "아니다"]
+  },
+  {
+    "questionNumber": "13-4",
+    "questionText": "욕조/욕실/샤워부스 바닥 재질이 미끄러운가요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["그렇다", "아니다"]
+  },
+  {
+    "questionNumber": "14-1",
+    "questionText": "침대에서 일어나기가 어려운가요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["그렇다", "아니다"]
+  },
+  {
+    "questionNumber": "14-2",
+    "questionText": "침실 바닥이 미끄러운가요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["그렇다", "아니다"]
+  },
+  {
+    "questionNumber": "15-1",
+    "questionText": "거실 바닥 재질이 미끄러운가요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["그렇다", "아니다"]
+  },
+  {
+    "questionNumber": "15-2",
+    "questionText": "주위 정리정돈이 잘 안되어있나요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["그렇다", "아니다"]
+  },
+  {
+    "questionNumber": "15-3",
+    "questionText": "문턱이나 단차가 있어서 걸려 넘어지기 쉬운가요?",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["그렇다", "아니다"]
+  },
+  {
+    "questionNumber": "15-4",
+    "questionText": "현관사용이 불편한가요",
+    "answerType": "SINGLE_CHOICE",
+    "options": ["그렇다", "아니다"]
+  }
+]
