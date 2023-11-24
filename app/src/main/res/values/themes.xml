@@ -3,6 +3,8 @@
 
     <style name="Theme.Happy_aging" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Your custom theme items -->
+        <item name="colorAccent">@color/main_orange</item>
+
     </style>
 
 </resources>

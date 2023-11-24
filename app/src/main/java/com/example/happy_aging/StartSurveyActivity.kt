@@ -6,6 +6,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.webkit.JavascriptInterface
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -31,7 +36,7 @@ class StartSurveyActivity : AppCompatActivity(), AddressSearchFragment.OnAddress
     private lateinit var nameEditText: EditText
     private lateinit var addressEditText: EditText
     private lateinit var userName: String
-
+    private lateinit var webView: WebView
 
 
     private val apiService: ApiService by lazy {
@@ -47,6 +52,8 @@ class StartSurveyActivity : AppCompatActivity(), AddressSearchFragment.OnAddress
         setContentView(R.layout.activity_start_survey)
         setupToolbar()
         initializeViews()
+        setupWebView()
+
     }
 
     private fun setupToolbar() {
@@ -71,7 +78,43 @@ class StartSurveyActivity : AppCompatActivity(), AddressSearchFragment.OnAddress
     private fun initializeViews() {
         nameEditText = findViewById(R.id.editTextName)
         addressEditText = findViewById(R.id.editTextAddress)
+        webView = findViewById(R.id.webView)
         findViewById<Button>(R.id.buttonNext).setOnClickListener { handleNextButtonClick() }
+
+        addressEditText.setOnClickListener {
+            Log.d("SurveyStartResults", "addressEditText가 터치됨 -> webView의 상태: $webView.visibility")
+
+            // 웹뷰를 보이게 하고 Daum 주소 검색 페이지 로드
+            webView.visibility = View.VISIBLE
+            webView.loadUrl("file:///android_asset/daum_postcode.html")
+        }
+    }
+    private fun setupWebView() {
+        Log.d("SurveyStartResults", "setupWebView 메서드 실행됨")
+
+        webView.settings.javaScriptEnabled = true
+        webView.addJavascriptInterface(object {
+            @JavascriptInterface
+            fun onAddressSelected(address: String) {
+                runOnUiThread {
+                    addressEditText.setText(address)
+                    webView.visibility = View.GONE
+                }
+            }
+        }, "Android")
+
+        // 첫 로딩 시에는 웹뷰를 숨김
+        webView.visibility = View.GONE
+        webView.webViewClient = object : WebViewClient() {
+            override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+                Log.e("WebView", "Error: ${error.description}")
+            }
+
+            override fun onPageFinished(view: WebView, url: String) {
+                Log.d("WebView", "Page loaded: $url")
+            }
+        }
+
     }
 
     private fun handleNextButtonClick() {

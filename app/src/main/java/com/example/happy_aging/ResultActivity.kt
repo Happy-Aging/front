@@ -38,7 +38,6 @@ class ResultActivity : AppCompatActivity() {
     private lateinit var textDate: TextView
     private lateinit var textRank: TextView
     private lateinit var buttonDownloadReport: Button
-    private lateinit var buttonViewPdfWeb: Button
     private var savedPdfFilePath: String? = null
     private var userNameFixed: String? = null
 
@@ -67,7 +66,6 @@ class ResultActivity : AppCompatActivity() {
         textRank = findViewById(R.id.textRank)
         textSurveyResult = findViewById(R.id.textSurveyResult)
         buttonDownloadReport = findViewById(R.id.buttonDownloadReport)
-        buttonViewPdfWeb = findViewById(R.id.buttonViewPdfWeb)
     }
 
     private fun loadDate() {
@@ -79,7 +77,7 @@ class ResultActivity : AppCompatActivity() {
         val summary = intent.getStringExtra("summary") ?: "No summary available"
         userNameFixed = intent.getStringExtra("userName")
 
-        textViewUserName.text = "$userNameFixed 님, 조사가 완료되었습니다."
+        textViewUserName.text = "{$userNameFixed}님의"
         textDate.text = date
         textRank.text = rank
         textSurveyResult.text = if (summary.length > 150) summary.substring(0, 150) + "..." else summary
@@ -89,25 +87,25 @@ class ResultActivity : AppCompatActivity() {
             else Toast.makeText(this, "결과 ID를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
         }
 
-        buttonViewPdfWeb.setOnClickListener { openPdfInWebBrowser() }
+//        buttonViewPdfWeb.setOnClickListener { openPdfInWebBrowser() }
     }
 
-    private fun openPdfInWebBrowser() {
-        Log.d("ResultActivity", "openPdfInWebBrowser 실행")
-
-        savedPdfFilePath?.let { filePath ->
-            val fileUri = FileProvider.getUriForFile(
-                this,
-                "${BuildConfig.APPLICATION_ID}.provider",
-                File(filePath)
-            )
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(fileUri, "application/pdf")
-                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            }
-            startActivity(intent)
-        } ?: Toast.makeText(this, "PDF 파일이 아직 다운로드되지 않았습니다.", Toast.LENGTH_SHORT).show()
-    }
+//    private fun openPdfInWebBrowser() {
+//        Log.d("ResultActivity", "openPdfInWebBrowser 실행")
+//
+//        savedPdfFilePath?.let { filePath ->
+//            val fileUri = FileProvider.getUriForFile(
+//                this,
+//                "${BuildConfig.APPLICATION_ID}.provider",
+//                File(filePath)
+//            )
+//            val intent = Intent(Intent.ACTION_VIEW).apply {
+//                setDataAndType(fileUri, "application/pdf")
+//                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+//            }
+//            startActivity(intent)
+//        } ?: Toast.makeText(this, "PDF 파일이 아직 다운로드되지 않았습니다.", Toast.LENGTH_SHORT).show()
+//    }
 
     private fun setupToolbar() {
         val customToolbar: View = layoutInflater.inflate(R.layout.toolbar_title, null)
@@ -183,6 +181,7 @@ class ResultActivity : AppCompatActivity() {
         val rank: Int,
         val summary: String
     ) : Serializable
+
 
 
 }

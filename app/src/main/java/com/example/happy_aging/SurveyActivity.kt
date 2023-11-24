@@ -1,5 +1,6 @@
 package com.example.happy_aging
 
+import android.app.AlertDialog
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
@@ -18,10 +19,12 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.app.Dialog
+import android.graphics.Color
 import android.os.Parcelable
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
@@ -110,23 +113,40 @@ class SurveyActivity : AppCompatActivity() {
     }
     private fun isAnswerProvided(): Boolean {
 
-        val question = questions.getJSONObject(currentQuestionIndex)
-        val answerType = question.getString("answerType")
+        try {
+            val question = questions.getJSONObject(currentQuestionIndex)
+            val answerType = question.getString("answerType")
 
-        return when (answerType) {
-            "SINGLE_CHOICE" -> {
-                val radioGroup = layoutAnswerOptions.getChildAt(0) as RadioGroup
-                radioGroup.checkedRadioButtonId != -1 // 라디오 버튼이 선택되었는지 확인
+            return when (answerType) {
+                "SINGLE_CHOICE" -> {
+                    var isRadioButtonChecked = false
+                    for (i in 0 until layoutAnswerOptions.childCount) {
+                        val child = layoutAnswerOptions.getChildAt(i)
+                        if (child is RadioGroup) {
+                            isRadioButtonChecked = child.checkedRadioButtonId != -1
+                            break // 라디오 그룹이 발견되면 반복문 종료
+                        }
+                    }
+                    isRadioButtonChecked
+                }
+                "NUMBER" -> {
+                    numberPicker.value != numberPicker.minValue // 넘버 피커의 값이 초기값이 아닌지 확인
+                }
+                else -> false
             }
-            "NUMBER" -> {
-                numberPicker.value != numberPicker.minValue // 넘버 피커의 값이 초기값이 아닌지 확인
-            }
-            else -> false
+        } catch (e: Exception) {
+            Log.e("SurveyActivity", "isAnswerProvided에서 오류 발생: ${e.message}")
+            return false // 예외 발생 시 false 반환
         }
     }
+
+
     private fun setupToolbar() {
-        val customToolbar: View = layoutInflater.inflate(R.layout.toolbar_title, null)
-        customToolbar.findViewById<ImageView>(R.id.back_button).setOnClickListener { finish() }
+        val customToolbar: View = layoutInflater.inflate(R.layout.toolbar_title_x, null)
+        customToolbar.findViewById<ImageView>(R.id.close_button).setOnClickListener {
+            // 대화상자 표시
+            showExitConfirmationDialog()
+        }
         customToolbar.findViewById<TextView>(R.id.toolbar_title).text = "설문조사"
 
         findViewById<Toolbar>(R.id.survey_toolbar).apply {
@@ -135,6 +155,28 @@ class SurveyActivity : AppCompatActivity() {
             supportActionBar?.setDisplayShowTitleEnabled(false)
         }
     }
+
+    private fun showExitConfirmationDialog() {
+        val dialogBuilder = AlertDialog.Builder(this)
+        dialogBuilder.setMessage("정말 조사를 끝내시겠습니까?")
+            .setCancelable(false)
+            .setPositiveButton("끝내기") { dialog, _ ->
+                dialog.dismiss()
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+            .setNegativeButton("계속 하기") { dialog, _ ->
+                dialog.cancel()
+            }
+        val alert = dialogBuilder.create()
+        alert.show()
+
+        // 버튼의 텍스트 색상을 main_orange로 변경
+        alert.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(this, R.color.main_orange))
+        alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(this, R.color.DarkGray))
+    }
+
 
     private fun loadQuestions() {
         val jsonStr = application.assets.open("questions.json").bufferedReader().use {
@@ -193,15 +235,17 @@ class SurveyActivity : AppCompatActivity() {
         progressBar.progress = (index + 1) * 100 / questions.length()
     }
 
-    private fun addRadioButtons(options: JSONArray) {
-        val radioGroup = RadioGroup(this)
-        for (i in 0 until options.length()) {
-            val radioButton = RadioButton(this)
-            radioButton.text = options.getString(i)
-            radioGroup.addView(radioButton)
-        }
-        layoutAnswerOptions.addView(radioGroup)
+private fun addRadioButtons(options: JSONArray) {
+    val radioGroup = RadioGroup(this)
+    for (i in 0 until options.length()) {
+        val radioButton = RadioButton(this)
+        radioButton.text = options.getString(i)
+        // 기본 라디오 버튼 스타일 사용
+        radioGroup.addView(radioButton)
     }
+    layoutAnswerOptions.addView(radioGroup) // RadioGroup을 layoutAnswerOptions에 추가
+}
+
 
     private fun saveResponse() {
         val question = questions.getJSONObject(currentQuestionIndex)
@@ -267,7 +311,6 @@ class SurveyActivity : AppCompatActivity() {
                     response.body()?.let { surveyResponse ->
                         Log.d("SurveyActivity", "Received response from server: $surveyResponse")
                         startResultActivity(surveyResponse) // 서버 응답이 성공적인 경우에만 ResultActivity를 시작
-//                        finish() // 현재 Activity 종료
                     } ?: run {
                         Log.d("SurveyActivity", "surveyResponse가 Null값임")
                     }
