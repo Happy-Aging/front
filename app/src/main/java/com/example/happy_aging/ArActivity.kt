@@ -2,6 +2,7 @@ package com.example.happy_aging
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.core.Anchor
 import com.google.ar.core.HitResult
@@ -30,7 +31,7 @@ class ArActivity : AppCompatActivity() {
     }
 
     private fun loadModel(itemId: String) {
-        val modelUri = Uri.parse("models/$itemId.obj") // models 폴더 내의 해당 파일
+        val modelUri = Uri.parse("models/$itemId.png") // models 폴더 내의 해당 파일
         ModelRenderable.builder()
             .setSource(this, modelUri)
             .build()
@@ -38,10 +39,10 @@ class ArActivity : AppCompatActivity() {
                 // 모델이 로드되면 해당 모델을 저장
                 modelMap[itemId] = renderable
             }
-//            .exceptionally { throwable ->
-//                // 에러 처리 로직
-//                null
-//            }
+            .exceptionally { throwable ->
+                Log.e("ArActivity", "모델 로딩 실패: $itemId", throwable)
+                null
+            }
     }
 
     private fun placeModel(hitResult: HitResult, itemName: String) {
