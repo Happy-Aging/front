@@ -1,7 +1,7 @@
 [
   {
     "questionNumber": "1",
-    "questionText": "응답자의 성별은 무엇입니까?",
+    "questionText": "어르신의 성별은 무엇입니까?",
     "answerType": "SINGLE_CHOICE",
     "options": ["남자", "여자"]
   },
@@ -13,13 +13,13 @@
   },
   {
     "questionNumber": "3",
-    "questionText": "현재 누구와 함께 사시나요?",
+    "questionText": "현재 누구와 함께 사시나요?\n(배우자와 자식과 함께 산다면 ‘배우자’로 체크하세요)",
     "answerType": "SINGLE_CHOICE",
     "options": ["혼자 살고 있음", "배우자", "자식", "기타"]
   },
   {
     "questionNumber": "4",
-    "questionText": "살고 계신 집의 형태는 어떤 것인가요?",
+    "questionText": "살고 계신 집의 형태를 선택하세요?",
     "answerType": "SINGLE_CHOICE",
     "options": ["아파트/주상복합", "연립주택/다세대주택", "단독주택", "기타"]
   },
@@ -37,7 +37,7 @@
   },
   {
     "questionNumber": "7-1",
-    "questionText": "가끔 보행 시 몸 움직임이 둔해지는 것을 느낀적이 있다.",
+    "questionText": "가끔 보행 시 몸 움직임이 둔해지는 것을 느낀 적이 있다.",
     "answerType": "SINGLE_CHOICE",
     "options": ["그렇다", "아니다"]
   },

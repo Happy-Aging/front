@@ -30,7 +30,7 @@ class ArActivity : AppCompatActivity() {
     }
 
     private fun loadModel(itemId: String) {
-        val modelUri = Uri.parse("models/$itemId.glb") // models 폴더 내의 해당 파일
+        val modelUri = Uri.parse("models/$itemId.obj") // models 폴더 내의 해당 파일
         ModelRenderable.builder()
             .setSource(this, modelUri)
             .build()

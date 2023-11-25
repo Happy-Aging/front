@@ -39,7 +39,7 @@ class ResultActivity : AppCompatActivity() {
     private lateinit var textRank: TextView
     private lateinit var buttonDownloadReport: Button
     private lateinit var progressBarDownload: ProgressBar
-    private lateinit var viewRankIndicator: View
+    private lateinit var imageViewRankIndicator: ImageView
 
 
 
@@ -64,6 +64,7 @@ class ResultActivity : AppCompatActivity() {
         loadDate()
         setupToolbar()
 
+
     }
 
     private fun initializeViews() {
@@ -72,7 +73,7 @@ class ResultActivity : AppCompatActivity() {
         textRank = findViewById(R.id.textRank)
         textSurveyResult = findViewById(R.id.textSurveyResult)
         buttonDownloadReport = findViewById(R.id.buttonDownloadReport)
-        viewRankIndicator = findViewById<View>(R.id.viewRankIndicator)
+        imageViewRankIndicator = findViewById(R.id.imageViewRankIndicator)
         progressBarDownload = findViewById<ProgressBar>(R.id.progressBarDownload)
     }
 
@@ -90,7 +91,7 @@ class ResultActivity : AppCompatActivity() {
         textRank.text = rank
         textSurveyResult.text = if (summary.length > 500) summary.substring(0, 500) + "..." else summary
 
-        setRankIndicatorPosition(viewRankIndicator, progressBarDownload, rank.toInt())
+        setRankIndicatorPosition(imageViewRankIndicator, progressBarDownload, rank.toInt())
 
         buttonDownloadReport.setOnClickListener {
             if (resultId != "-1") downloadReport(resultId.toLong())
@@ -135,7 +136,7 @@ class ResultActivity : AppCompatActivity() {
             supportActionBar?.setDisplayShowTitleEnabled(false)
         }
     }
-    private fun setRankIndicatorPosition(indicator: View, progressBar: ProgressBar, rank: Int) {
+    private fun setRankIndicatorPosition(indicator: ImageView, progressBar: ProgressBar, rank: Int) {
         val maxRank = progressBar.max
         progressBar.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
@@ -145,7 +146,6 @@ class ResultActivity : AppCompatActivity() {
                 val layoutParams = indicator.layoutParams as RelativeLayout.LayoutParams
                 layoutParams.marginStart = indicatorPosition - (indicator.width / 2)
                 indicator.layoutParams = layoutParams
-                indicator.visibility = View.VISIBLE
             }
         })
     }
@@ -192,7 +192,7 @@ class ResultActivity : AppCompatActivity() {
                     outputStream.write(buffer, 0, bytesRead)
                 }
                 updateDownloadPathLayout(filePath)
-                Toast.makeText(this, "파일 저장 완료: $filePath", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "보고서 파일이 다운 경로에 저장되었습니다", Toast.LENGTH_LONG).show()
             } catch (e: IOException) {
                 e.printStackTrace()
                 Toast.makeText(this, "파일 저장 실패: ${e.message}", Toast.LENGTH_SHORT).show()

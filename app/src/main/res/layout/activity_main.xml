@@ -52,9 +52,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="5dp"
                     android:textSize="@dimen/main_small_text_size"
-                    android:text="5분 안에 AI답변을 받을 수 있어요"/>
+                    android:text="5분만에 낙상 예방 AI 솔루션을 받을 수 있어요"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -94,14 +94,14 @@
                     android:textSize="@dimen/main_text_size"
                     android:textColor="@android:color/black"
                     android:textStyle="bold"
-                    android:text="AR 카메라로 미리보기"/>
+                    android:text="증강현실에서 낙상 예방품 미리보기"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/main_small_text_size"
-                    android:layout_marginTop="2dp"
-                    android:text="낙상 예방품을 배치한 모습을 볼 수 있어요"/>
+                    android:layout_marginTop="5dp"
+                    android:text="AR 카메라로 생생하게 볼 수 있어요"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

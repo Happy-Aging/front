@@ -2,6 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
+    android:layout_marginRight="16dp"
+    android:layout_marginLeft="16dp"
+
     >
 
     <!-- 타이틀 텍스트뷰. 중앙에 배치됩니다. -->
@@ -19,7 +22,6 @@
         android:layout_height="30dp"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="24dp"
         android:src="@drawable/ic_close" />
 
 </RelativeLayout>

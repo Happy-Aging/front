@@ -1,36 +1,27 @@
 package com.example.happy_aging
 
-import android.app.Dialog
 import android.content.Intent
 import android.graphics.Typeface
-import android.net.http.SslError
-import android.os.Build
 import android.os.Bundle
-import android.os.Message
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.webkit.JavascriptInterface
-import android.webkit.SslErrorHandler
-import android.webkit.WebChromeClient
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
-import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import okhttp3.MediaType
 import okhttp3.RequestBody
+import org.json.JSONArray
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -42,9 +33,11 @@ import retrofit2.http.POST
 class StartSurveyActivity : AppCompatActivity() {
 
     private lateinit var nameEditText: EditText
-    private lateinit var addressEditText: EditText
     private lateinit var userName: String
-    private lateinit var addressResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var spinnerBigCity: Spinner
+    private lateinit var spinnerSmallCity: Spinner
+    private var selectedBigCity: String? = null
+    private var selectedSmallCity: String? = null
 
 
     private val apiService: ApiService by lazy {
@@ -60,13 +53,6 @@ class StartSurveyActivity : AppCompatActivity() {
         setContentView(R.layout.activity_start_survey)
         setupToolbar()
         initializeViews()
-
-        addressResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                val address = result.data?.getStringExtra("address")
-                addressEditText.setText(address)
-            }
-        }
     }
 
 
@@ -90,19 +76,82 @@ class StartSurveyActivity : AppCompatActivity() {
 
     private fun initializeViews() {
         nameEditText = findViewById(R.id.editTextName)
-        addressEditText = findViewById(R.id.editTextBigCity)
+        spinnerBigCity = findViewById(R.id.spinnerBigCity)
+        spinnerSmallCity = findViewById(R.id.spinnerSmallCity)
         findViewById<Button>(R.id.buttonNext).setOnClickListener { handleNextButtonClick() }
 
-        addressEditText.setOnClickListener {
-            Log.d("SurveyStartResults", "AddressSearchActivity를 여는 인텐트 생성 및 실행")
-            val intent = Intent(this, AddressSearchActivity::class.java)
-            addressResultLauncher.launch(intent)
+        setupSpinners()
+    }
+    private fun getCityData(): JSONObject {
+        val fileName = "cities.json" // `assets` 폴더 내의 파일 이름
+        val assets = this.assets
+        val inputStream = assets.open(fileName)
+        val size = inputStream.available()
+        val buffer = ByteArray(size)
+
+        inputStream.read(buffer)
+        inputStream.close()
+
+        val jsonStr = String(buffer, Charsets.UTF_8)
+        return JSONObject(jsonStr)
+    }
+
+    private fun setupSpinners() {
+        val cityData = getCityData()
+        val bigCities = mutableListOf("도/시")
+        bigCities.addAll(cityData.keys().asSequence().toList())
+
+        spinnerBigCity.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, bigCities)
+        spinnerBigCity.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                if (position > 0) { // '도/시'가 아닌 실제 아이템이 선택된 경우
+                    selectedBigCity = bigCities[position]
+                    val smallCitiesArray = cityData.getJSONArray(selectedBigCity)
+                    val smallCitiesList = convertJsonArrayToList(smallCitiesArray)
+                    smallCitiesList.add(0, "시/군/구")
+                    spinnerSmallCity.adapter = ArrayAdapter(this@StartSurveyActivity, android.R.layout.simple_spinner_dropdown_item, smallCitiesList)
+
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // 아무것도 선택되지 않았을 때의 로직
+            }
         }
+
+        // 초기 smallCity 스피너 설정
+        spinnerSmallCity.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, listOf("시/군/구"))
+
+        spinnerSmallCity.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                if (position > 0) { // '시/군/구'가 아닌 실제 아이템이 선택된 경우
+                    selectedSmallCity = parent.getItemAtPosition(position).toString()
+                } else {
+                    selectedSmallCity = null // 플레이스홀더가 선택된 경우
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                selectedSmallCity = null
+            }
+        }
+    }
+
+    private fun convertJsonArrayToList(jsonArray: JSONArray): MutableList<String> {
+        val list = mutableListOf<String>()
+        for (i in 0 until jsonArray.length()) {
+            list.add(jsonArray.getString(i))
+        }
+        return list
     }
 
     private fun handleNextButtonClick() {
         userName = nameEditText.text.toString()
-        val address = addressEditText.text.toString()
+        val address = if (!selectedBigCity.isNullOrBlank() && !selectedSmallCity.isNullOrBlank()) {
+            "$selectedBigCity, $selectedSmallCity"
+        } else {
+            ""
+        }
 
         if (userName.isNotBlank() && address.isNotBlank()) {
             sendSeniorData(userName, address)
@@ -111,7 +160,11 @@ class StartSurveyActivity : AppCompatActivity() {
         }
     }
 
+
+
+
     private fun sendSeniorData(name: String, address: String) {
+
         val jsonObject = JSONObject().apply {
             put("name", name)
             put("address", address)
@@ -143,6 +196,7 @@ class StartSurveyActivity : AppCompatActivity() {
             putExtra("userName", userName)
         }
         startActivity(intent)
+        finish()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

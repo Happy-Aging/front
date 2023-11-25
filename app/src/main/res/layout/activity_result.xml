@@ -49,6 +49,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:orientation="horizontal">
 
             <TextView
@@ -56,8 +57,7 @@
                 android:layout_height="wrap_content"
                 android:text="낙상 사고 위험도는 "
                 android:textSize="24sp"
-                android:textColor="@color/DarkGray"
-                android:layout_marginBottom="20dp"/>
+                android:textColor="@color/DarkGray"/>
             <TextView
                 android:id="@+id/textRank"
                 android:layout_width="wrap_content"
@@ -65,38 +65,28 @@
                 android:text="2"
                 android:textSize="26sp"
                 android:textStyle="bold"
-                android:textColor="#FF0000"
-                android:layout_marginBottom="20dp"/>
+                android:textColor="#FF0000"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="등급"
                 android:textSize="26sp"
                 android:textStyle="bold"
-                android:textColor="#FF0000"
-                android:layout_marginBottom="20dp"/>
+                android:textColor="#FF0000"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="입니다"
                 android:textSize="24sp"
-                android:textColor="@color/DarkGray"
-                android:layout_marginBottom="20dp"/>
+                android:textColor="@color/DarkGray"/>
         </LinearLayout>
 
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <View
-                android:id="@+id/viewRankIndicator"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:background="@color/black"
-                android:layout_alignTop="@id/progressBarDownload"
-                android:layout_alignBottom="@id/progressBarDownload"
-                android:visibility="invisible"/>
+            android:layout_height="wrap_content"
+            >
 
 
             <ProgressBar
@@ -104,10 +94,20 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="12dp"
+                android:layout_marginTop="12dp"
                 android:progressDrawable="@drawable/progress_bar_gradient"
                 android:max="5"
                 android:progress="5"
                 android:layout_marginBottom="10dp"/>
+
+            <ImageView
+                android:id="@+id/imageViewRankIndicator"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="-10dp"
+                android:src="@drawable/icon_pointer"
+                android:visibility="visible" />
+
 
             <TextView
                 android:layout_width="wrap_content"

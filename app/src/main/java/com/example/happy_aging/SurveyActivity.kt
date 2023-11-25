@@ -216,10 +216,16 @@ class SurveyActivity : AppCompatActivity() {
 
 private fun addRadioButtons(options: JSONArray) {
     val radioGroup = RadioGroup(this)
+    val layoutParams = RadioGroup.LayoutParams(
+        RadioGroup.LayoutParams.WRAP_CONTENT,
+        RadioGroup.LayoutParams.WRAP_CONTENT
+    )
     for (i in 0 until options.length()) {
         val radioButton = RadioButton(this)
         radioButton.text = options.getString(i)
         radioButton.textSize = 18f        // 기본 라디오 버튼 스타일 사용
+        layoutParams.setMargins(0, 8, 0, 8) // 상단과 하단 마진 설정
+        radioButton.layoutParams = layoutParams
         radioGroup.addView(radioButton)
     }
     layoutAnswerOptions.addView(radioGroup) // RadioGroup을 layoutAnswerOptions에 추가
@@ -263,6 +269,7 @@ private fun addRadioButtons(options: JSONArray) {
             Log.d("SurveyActivity", "response은 ${response.toString()}")
         }
         startActivity(intent)
+        finish()
     }
     // 서버에 requestBody 보냄
 

@@ -1,8 +1,14 @@
 package com.example.happy_aging
 
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -15,6 +21,7 @@ class ListActivity : AppCompatActivity(), ItemAdapter.OnItemClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
+        setupToolbar()
 
         items = listOf(
             Item("실버카 성인용 보행기", "item1", R.drawable.img_car_walker),
@@ -28,6 +35,24 @@ class ListActivity : AppCompatActivity(), ItemAdapter.OnItemClickListener {
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = itemAdapter
+    }
+
+    private fun setupToolbar() {
+        val customToolbar: View = layoutInflater.inflate(R.layout.toolbar_title, null)
+        customToolbar.findViewById<ImageView>(R.id.back_button).setOnClickListener { finish() }
+
+        val toolbarTitle: TextView = customToolbar.findViewById(R.id.toolbar_title)
+        toolbarTitle.apply {
+            text = "낙하 사고 예방템"
+            setTextColor(ContextCompat.getColor(context, android.R.color.black))
+            setTypeface(typeface, Typeface.BOLD)
+        }
+
+        findViewById<Toolbar>(R.id.toolbar).apply {
+            addView(customToolbar)
+            setSupportActionBar(this)
+            supportActionBar?.setDisplayShowTitleEnabled(false)
+        }
     }
 
     override fun onItemClick(position: Int) {
