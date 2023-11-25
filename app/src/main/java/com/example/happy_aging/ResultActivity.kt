@@ -1,20 +1,19 @@
 package com.example.happy_aging
 
-import android.content.Intent
-import android.graphics.Color
 import android.graphics.Typeface
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import com.google.android.filament.BuildConfig
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -38,6 +37,11 @@ class ResultActivity : AppCompatActivity() {
     private lateinit var textDate: TextView
     private lateinit var textRank: TextView
     private lateinit var buttonDownloadReport: Button
+    private lateinit var progressBarDownload: ProgressBar
+    private lateinit var viewRankIndicator: View
+
+
+
     private var savedPdfFilePath: String? = null
     private var userNameFixed: String? = null
 
@@ -58,6 +62,7 @@ class ResultActivity : AppCompatActivity() {
         initializeViews()
         loadDate()
         setupToolbar()
+
     }
 
     private fun initializeViews() {
@@ -66,6 +71,8 @@ class ResultActivity : AppCompatActivity() {
         textRank = findViewById(R.id.textRank)
         textSurveyResult = findViewById(R.id.textSurveyResult)
         buttonDownloadReport = findViewById(R.id.buttonDownloadReport)
+        viewRankIndicator = findViewById<View>(R.id.viewRankIndicator)
+        progressBarDownload = findViewById<ProgressBar>(R.id.progressBarDownload)
     }
 
     private fun loadDate() {
@@ -77,15 +84,18 @@ class ResultActivity : AppCompatActivity() {
         val summary = intent.getStringExtra("summary") ?: "No summary available"
         userNameFixed = intent.getStringExtra("userName")
 
-        textViewUserName.text = "{$userNameFixed}님의"
+        textViewUserName.text = "$userNameFixed"
         textDate.text = date
         textRank.text = rank
         textSurveyResult.text = if (summary.length > 150) summary.substring(0, 150) + "..." else summary
+
+        setRankIndicatorPosition(viewRankIndicator, progressBarDownload, rank.toInt())
 
         buttonDownloadReport.setOnClickListener {
             if (resultId != "-1") downloadReport(resultId.toLong())
             else Toast.makeText(this, "결과 ID를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
         }
+
 
 //        buttonViewPdfWeb.setOnClickListener { openPdfInWebBrowser() }
     }
@@ -123,6 +133,20 @@ class ResultActivity : AppCompatActivity() {
             setSupportActionBar(this)
             supportActionBar?.setDisplayShowTitleEnabled(false)
         }
+    }
+    private fun setRankIndicatorPosition(indicator: View, progressBar: ProgressBar, rank: Int) {
+        val maxRank = progressBar.max
+        progressBar.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                progressBar.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                val width = progressBar.width
+                val indicatorPosition = (width * rank / maxRank.toFloat()).toInt()
+                val layoutParams = indicator.layoutParams as RelativeLayout.LayoutParams
+                layoutParams.marginStart = indicatorPosition - (indicator.width / 2)
+                indicator.layoutParams = layoutParams
+                indicator.visibility = View.VISIBLE
+            }
+        })
     }
 
     private fun downloadReport(resultId: Long) {

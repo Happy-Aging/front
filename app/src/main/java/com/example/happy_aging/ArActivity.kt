@@ -38,10 +38,10 @@ class ArActivity : AppCompatActivity() {
                 // 모델이 로드되면 해당 모델을 저장
                 modelMap[itemId] = renderable
             }
-            .exceptionally { throwable ->
-                // 에러 처리 로직
-                null
-            }
+//            .exceptionally { throwable ->
+//                // 에러 처리 로직
+//                null
+//            }
     }
 
     private fun placeModel(hitResult: HitResult, itemName: String) {

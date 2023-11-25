@@ -1,13 +1,13 @@
 [
   {
     "questionNumber": "1",
-    "questionText": "응답자의 성별",
+    "questionText": "응답자의 성별은 무엇입니까?",
     "answerType": "SINGLE_CHOICE",
     "options": ["남자", "여자"]
   },
   {
     "questionNumber": "2",
-    "questionText": "어르신 몇 년생이신가요?",
+    "questionText": "어르신은 몇 년생이신가요?",
     "answerType": "NUMBER",
     "options": [ ]
   },

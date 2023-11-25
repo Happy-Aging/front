@@ -13,35 +13,49 @@
         android:background="?attr/colorPrimary"
         app:popupTheme="@style/Theme.AppCompat.Light" />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:background="@color/bg_lightGray"
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        android:progressDrawable="@drawable/custom_progressbar" />
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="21dp"
         android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:background="@color/bg_lightGray"
-            android:layout_width="match_parent"
-            android:layout_height="16dp"
-            android:progressDrawable="@drawable/custom_progressbar" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="6dp"
+            android:textColor="@color/black"
+            android:text="문제"
+            android:textSize="21sp" />
 
 
         <TextView
             android:id="@+id/textViewNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:textSize="18sp" />
+            android:textColor="@color/black"
+            android:textSize="21sp" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/textViewQuestion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/black"
             android:layout_marginTop="20dp"
-            android:textSize="18sp" />
+            android:textSize="28sp" />
 
         <LinearLayout
             android:id="@+id/layoutAnswerOptions"
@@ -63,6 +77,7 @@
             android:layout_marginTop="20dp"
             android:background="@drawable/rounded_orange_button"
             android:text="다음 문제"
+            android:textSize="18sp"
             android:textColor="@color/white" />
     </LinearLayout>
 

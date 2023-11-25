@@ -16,23 +16,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setupToolbar()
-//
-//        configureButton(R.id.startButton, R.drawable.icon_survey, "Start Survey", R.layout.custom_twolines_button_layout)
-//        configureButton(R.id.start_ar_button, R.drawable.icon_ar, "Start AR", R.layout.custom_twolines_button_layout)
-//        configureButton(R.id.goStore_button, R.drawable.icon_store, "Go to Store", R.layout.button_custom_layout)
-//        configureButton(R.id.video_button, R.drawable.icon_video, "Play Video", R.layout.button_custom_layout)
 
         setupButtonListeners()
-    }
-
-    private fun configureButton(buttonId: Int, iconResId: Int, text: String, layoutId: Int) {
-        val frameLayout: FrameLayout = findViewById(buttonId)
-        val customLayout: View = layoutInflater.inflate(layoutId, null)
-
-        customLayout.findViewById<ImageView>(R.id.button_icon).setImageResource(iconResId)
-        customLayout.findViewById<TextView>(R.id.button_text).text = text
-
-        frameLayout.addView(customLayout)
     }
 
 

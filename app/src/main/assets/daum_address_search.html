@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daum 주소 검색</title>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script>
+        function openDaumPostcode() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    // 주소 선택 시 실행될 콜백 함수
+                    window.Android.onAddressSelected(data.address);
+                }
+            }).open();
+        }
+    </script>
+</head>
+<body>
+<script>
+        openDaumPostcode();
+    </script>
+</body>
+</html>

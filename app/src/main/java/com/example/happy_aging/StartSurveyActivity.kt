@@ -1,12 +1,15 @@
 package com.example.happy_aging
 
+import android.app.Dialog
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
+import android.os.Message
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -17,6 +20,8 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -30,13 +35,13 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.POST
-
-class StartSurveyActivity : AppCompatActivity(), AddressSearchFragment.OnAddressSelectedListener {
+class StartSurveyActivity : AppCompatActivity() {
 
     private lateinit var nameEditText: EditText
     private lateinit var addressEditText: EditText
-    private lateinit var userName: String
     private lateinit var webView: WebView
+    private lateinit var userName: String
+    private lateinit var addressResultLauncher: ActivityResultLauncher<Intent>
 
 
     private val apiService: ApiService by lazy {
@@ -54,7 +59,14 @@ class StartSurveyActivity : AppCompatActivity(), AddressSearchFragment.OnAddress
         initializeViews()
         setupWebView()
 
+        addressResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val address = result.data?.getStringExtra("address")
+                addressEditText.setText(address)
+            }
+        }
     }
+
 
     private fun setupToolbar() {
         val customToolbar: View = layoutInflater.inflate(R.layout.toolbar_title, null)
@@ -63,8 +75,8 @@ class StartSurveyActivity : AppCompatActivity(), AddressSearchFragment.OnAddress
         val toolbarTitle: TextView = customToolbar.findViewById(R.id.toolbar_title)
         toolbarTitle.apply {
             text = "시니어 등록"
-            setTextColor(ContextCompat.getColor(context, android.R.color.black)) // Set text color to black
-            setTypeface(typeface, Typeface.BOLD) // Set text style to bold
+            setTextColor(ContextCompat.getColor(context, android.R.color.black))
+            setTypeface(typeface, Typeface.BOLD)
         }
 
         findViewById<Toolbar>(R.id.toolbar).apply {
@@ -74,23 +86,24 @@ class StartSurveyActivity : AppCompatActivity(), AddressSearchFragment.OnAddress
         }
     }
 
-
     private fun initializeViews() {
         nameEditText = findViewById(R.id.editTextName)
         addressEditText = findViewById(R.id.editTextAddress)
         webView = findViewById(R.id.webView)
         findViewById<Button>(R.id.buttonNext).setOnClickListener { handleNextButtonClick() }
 
-        addressEditText.setOnClickListener {
-            Log.d("SurveyStartResults", "addressEditText가 터치됨 -> webView의 상태: $webView.visibility")
 
-            // 웹뷰를 보이게 하고 Daum 주소 검색 페이지 로드
-            webView.visibility = View.VISIBLE
-            webView.loadUrl("file:///android_asset/daum_postcode.html")
+        addressEditText.setOnClickListener {
+            Log.d("SurveyStartResults", "AddressSearchActivity를 여는 인텐트 생성 및 실행")
+
+            val intent = Intent(this, AddressSearchActivity::class.java)
+            addressResultLauncher.launch(intent)
         }
+
     }
+
     private fun setupWebView() {
-        Log.d("SurveyStartResults", "setupWebView 메서드 실행됨")
+        Log.d("SurveyStartResults", "Setting up WebView")
 
         webView.settings.javaScriptEnabled = true
         webView.addJavascriptInterface(object {
@@ -103,15 +116,27 @@ class StartSurveyActivity : AppCompatActivity(), AddressSearchFragment.OnAddress
             }
         }, "Android")
 
-        // 첫 로딩 시에는 웹뷰를 숨김
         webView.visibility = View.GONE
-        webView.webViewClient = object : WebViewClient() {
-            override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
-                Log.e("WebView", "Error: ${error.description}")
-            }
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onCreateWindow(view: WebView, isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message): Boolean {
+                val newWebView = WebView(view.context)
+                newWebView.webViewClient = WebViewClient()
+                newWebView.settings.javaScriptEnabled = true
 
-            override fun onPageFinished(view: WebView, url: String) {
-                Log.d("WebView", "Page loaded: $url")
+                val dialog = Dialog(view.context)
+                dialog.setContentView(newWebView)
+                dialog.show()
+
+                newWebView.webChromeClient = object : WebChromeClient() {
+                    override fun onCloseWindow(window: WebView) {
+                        dialog.dismiss()
+                    }
+                }
+
+                (resultMsg.obj as WebView.WebViewTransport).webView = newWebView
+                resultMsg.sendToTarget()
+
+                return true
             }
         }
 
@@ -164,20 +189,9 @@ class StartSurveyActivity : AppCompatActivity(), AddressSearchFragment.OnAddress
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            onBackPressed()
             return true
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onAddressSelected(address: String) {
-        addressEditText.setText(address)
-        hideAddressSearchFragment()
-    }
-
-    private fun hideAddressSearchFragment() {
-        findViewById<FrameLayout>(R.id.fragmentContainer).visibility = View.GONE
-        supportFragmentManager.popBackStack()
     }
 
     // API Service Interface
@@ -197,7 +211,10 @@ class StartSurveyActivity : AppCompatActivity(), AddressSearchFragment.OnAddress
     )
 
     companion object {
+        private const val ADDRESS_SEARCH_REQUEST_CODE = 1
+
         private fun String.toRequestBody() =
             okhttp3.RequestBody.create(MediaType.parse("application/json"), this)
     }
 }
+

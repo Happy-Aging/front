@@ -21,6 +21,7 @@ import android.view.ViewGroup
 import android.app.Dialog
 import android.graphics.Color
 import android.os.Parcelable
+import android.util.TypedValue
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -46,18 +47,19 @@ class SurveyActivity : AppCompatActivity() {
     private lateinit var layoutAnswerOptions: LinearLayout
     private lateinit var buttonNext: Button
     private lateinit var numberPicker: NumberPicker
-    private lateinit var loadingDialog: Dialog
 
     private lateinit var questions: JSONArray
     private var currentQuestionIndex = 0
     private val userResponses = mutableMapOf<String, String>() // Use String as the key type
+    private var loadingDialog: Dialog? = null
+
 
     private var seniorId = 0
     private val apiService: ApiService by lazy {
         val okHttpClient = OkHttpClient.Builder()
-            .connectTimeout(60, TimeUnit.SECONDS) // 연결 타임아웃 설정
-            .readTimeout(60, TimeUnit.SECONDS) // 읽기 타임아웃 설정
-            .writeTimeout(60, TimeUnit.SECONDS) // 쓰기 타임아웃 설정
+            .connectTimeout(200, TimeUnit.SECONDS) // 연결 타임아웃 설정
+            .readTimeout(200, TimeUnit.SECONDS) // 읽기 타임아웃 설정
+            .writeTimeout(200, TimeUnit.SECONDS) // 쓰기 타임아웃 설정
             .build()
 
         // Retrofit 인스턴스 생성
@@ -74,6 +76,8 @@ class SurveyActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_survey)
         seniorId = intent.getIntExtra("seniorId", -1)
+
+
 
         progressBar = findViewById(R.id.progressBar)
         textViewNumber = findViewById(R.id.textViewNumber)
@@ -186,31 +190,6 @@ class SurveyActivity : AppCompatActivity() {
         displayQuestion(currentQuestionIndex)
     }
 
-    private fun showLoadingAndSubmit() {
-
-        // 대화상자 생성 및 설정
-        loadingDialog = Dialog(this).apply {
-            setContentView(R.layout.loading_dialog)
-            setCancelable(false) // 대화상자 외부 클릭시 닫히지 않도록 설정
-            window?.setLayout(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        }
-
-        // 로딩 텍스트 설정
-        val loadingText = loadingDialog.findViewById<TextView>(R.id.loading_text)
-        loadingText.text = "지금 AI가 낙상 위험도를 분석 중입니다"
-
-        loadingDialog.show() // 로딩 대화상자 표시
-
-        // 4초 후 ResultActivity로 이동
-        Handler(Looper.getMainLooper()).postDelayed({
-            loadingDialog.dismiss() // 로딩 대화상자 닫기
-            finish()
-        }, 50000)
-    }
-
     private fun displayQuestion(index: Int) {
         if (index >= questions.length()) {
             Log.d("SurveyActivity", "질문이 더 이상 없음")
@@ -240,7 +219,7 @@ private fun addRadioButtons(options: JSONArray) {
     for (i in 0 until options.length()) {
         val radioButton = RadioButton(this)
         radioButton.text = options.getString(i)
-        // 기본 라디오 버튼 스타일 사용
+        radioButton.textSize = 18f        // 기본 라디오 버튼 스타일 사용
         radioGroup.addView(radioButton)
     }
     layoutAnswerOptions.addView(radioGroup) // RadioGroup을 layoutAnswerOptions에 추가
@@ -286,46 +265,61 @@ private fun addRadioButtons(options: JSONArray) {
         startActivity(intent)
     }
     // 서버에 requestBody 보냄
+
+    private fun showLoadingAndSubmit() {
+        loadingDialog = Dialog(this).apply {
+            setContentView(R.layout.loading_dialog)
+            setCancelable(false)
+            window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        }
+        loadingDialog?.show()
+    }
     private fun submitResponsesToServer() {
         Log.d("SurveyActivity", "Submitting responses to server")
+        showLoadingAndSubmit()
 
         if (!areAllQuestionsAnswered()) {
             Toast.makeText(this, "모든 질문에 답해주세요.", Toast.LENGTH_SHORT).show()
+            loadingDialog?.dismiss()
             return
         }
 
         val responseDTOs = userResponses.map { (questionNumber, response) ->
             ResponseDTO(questionNumber, response)
         }
-
         val surveyResultsRequest = SurveyResultsRequest(responseDTOs)
         val requestBody = Gson().toJson(surveyResultsRequest).toRequestBody()
 
-        showLoadingAndSubmit() // 로딩 대화상자 표시
-
-        // 서버에서 response 받아옴
         apiService.submitSurveyResults(seniorId, requestBody).enqueue(object : Callback<SurveyResultsResponse> {
             override fun onResponse(call: Call<SurveyResultsResponse>, response: Response<SurveyResultsResponse>) {
-
+                loadingDialog?.dismiss()
                 if (response.isSuccessful) {
                     response.body()?.let { surveyResponse ->
                         Log.d("SurveyActivity", "Received response from server: $surveyResponse")
-                        startResultActivity(surveyResponse) // 서버 응답이 성공적인 경우에만 ResultActivity를 시작
-                    } ?: run {
-                        Log.d("SurveyActivity", "surveyResponse가 Null값임")
-                    }
+                        startResultActivity(surveyResponse)
+                    } ?: showErrorDialog("서버에서 유효한 응답을 받지 못했습니다.")
                 } else {
-                    Log.d("SurveyActivity", "Response 실패: ${response.code()} - ${response.message()}")
-                    handleErrorResponse(response)
+                    showErrorDialog("서버 오류: ${response.message()}")
                 }
             }
 
             override fun onFailure(call: Call<SurveyResultsResponse>, t: Throwable) {
-                loadingDialog.dismiss() // 로딩 대화상자 닫기
+                loadingDialog?.dismiss()
+                showErrorDialog("서버에 문제가 생겼습니다.")
                 Log.e("SurveyActivity", "Failed to submit responses: ${t.message}")
             }
         })
     }
+
+    private fun showErrorDialog(message: String) {
+        AlertDialog.Builder(this).apply {
+            setMessage(message)
+            setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+            create().show()
+        }
+    }
+
+
     private fun handleErrorResponse(response: Response<SurveyResultsResponse>) {
         Log.e("SurveyActivity", "Response 실패: ${response.code()} - ${response.message()}")
 
@@ -345,6 +339,17 @@ private fun addRadioButtons(options: JSONArray) {
                 Toast.makeText(this, "오류 발생: $errorBody", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+
+    override fun onPause() {
+        super.onPause()
+        loadingDialog?.dismiss() // onPause 시 Dialog 닫기
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        loadingDialog?.dismiss() // onDestroy 시 Dialog 닫기
     }
 
     interface ApiService {
