@@ -17,9 +17,10 @@ class ListActivity : AppCompatActivity(), ItemAdapter.OnItemClickListener {
         setContentView(R.layout.activity_list)
 
         items = listOf(
-            Item("지팡이", "item1", R.drawable.img_item1),
-            Item("매트", "item2",R.drawable.img_item2),
-            Item("손잡이", "item3",R.drawable.img_item3)
+            Item("실버카 성인용 보행기", "item1", R.drawable.img_car_walker),
+            Item("전동식 의료용 침대", "item2",R.drawable.img_bed),
+            Item("2단 바퀴 실내 성인용 보행기", "item3",R.drawable.img_car_walker_two),
+            Item("복지용구 목욕의자", "item4",R.drawable.img_chair)
         )
 
         recyclerView = findViewById(R.id.recycler_view)

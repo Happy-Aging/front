@@ -55,6 +55,8 @@
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:layout_marginTop="20dp"
+            android:text="예상 질문입니다 예상 질문입니다 예상 질문입니다 예상 질문입니다"
+            android:lineSpacingExtra="4dp"
             android:textSize="28sp" />
 
         <LinearLayout

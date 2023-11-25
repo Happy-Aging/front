@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -87,7 +88,7 @@ class ResultActivity : AppCompatActivity() {
         textViewUserName.text = "$userNameFixed"
         textDate.text = date
         textRank.text = rank
-        textSurveyResult.text = if (summary.length > 150) summary.substring(0, 150) + "..." else summary
+        textSurveyResult.text = if (summary.length > 500) summary.substring(0, 500) + "..." else summary
 
         setRankIndicatorPosition(viewRankIndicator, progressBarDownload, rank.toInt())
 
@@ -163,6 +164,14 @@ class ResultActivity : AppCompatActivity() {
                 Toast.makeText(this@ResultActivity, "파일 다운로드 실패: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+
+    }
+    private fun updateDownloadPathLayout(filePath: String) {
+        val layoutDownPath = findViewById<LinearLayout>(R.id.layoutDownPath)
+        val textDownPath = findViewById<TextView>(R.id.textDownPath)
+
+        layoutDownPath.visibility = View.VISIBLE
+        textDownPath.text = filePath
     }
 
     private fun savePdfToFileSystem(body: ResponseBody) {
@@ -182,6 +191,7 @@ class ResultActivity : AppCompatActivity() {
                 while (inputStream.read(buffer).also { bytesRead = it } != -1) {
                     outputStream.write(buffer, 0, bytesRead)
                 }
+                updateDownloadPathLayout(filePath)
                 Toast.makeText(this, "파일 저장 완료: $filePath", Toast.LENGTH_LONG).show()
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -194,6 +204,7 @@ class ResultActivity : AppCompatActivity() {
             e.printStackTrace()
             Toast.makeText(this, "파일 저장 오류: ${e.message}", Toast.LENGTH_SHORT).show()
         }
+
     }
     interface ApiService {
         @GET("/survey/{resultId}/download")

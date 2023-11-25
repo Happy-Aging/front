@@ -57,9 +57,9 @@ class SurveyActivity : AppCompatActivity() {
     private var seniorId = 0
     private val apiService: ApiService by lazy {
         val okHttpClient = OkHttpClient.Builder()
-            .connectTimeout(200, TimeUnit.SECONDS) // 연결 타임아웃 설정
-            .readTimeout(200, TimeUnit.SECONDS) // 읽기 타임아웃 설정
-            .writeTimeout(200, TimeUnit.SECONDS) // 쓰기 타임아웃 설정
+            .connectTimeout(600, TimeUnit.SECONDS) // 연결 타임아웃 설정
+            .readTimeout(600, TimeUnit.SECONDS) // 읽기 타임아웃 설정
+            .writeTimeout(600, TimeUnit.SECONDS) // 쓰기 타임아웃 설정
             .build()
 
         // Retrofit 인스턴스 생성

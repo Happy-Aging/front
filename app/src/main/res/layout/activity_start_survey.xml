@@ -28,30 +28,32 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:src="@drawable/icon" />
+
         <View
             android:layout_width="match_parent"
-            android:layout_height="12dp"/>
+            android:layout_height="12dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
+            android:text="해피에이징"
             android:textColor="@color/black"
             android:textSize="24sp"
-            android:text="해피에이징"/>
+            android:textStyle="bold" />
+
         <View
             android:layout_width="match_parent"
-            android:layout_height="32dp"/>
+            android:layout_height="32dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:layout_marginBottom="6dp"
-            android:textStyle="bold"
+            android:text="이름"
             android:textColor="@color/black"
             android:textSize="18sp"
-            android:text="이름"/>
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/editTextName"
@@ -63,31 +65,53 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:textCursorDrawable="@drawable/cursor_color" />
+
         <View
             android:layout_width="match_parent"
-            android:layout_height="21dp"/>
+            android:layout_height="21dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:layout_marginBottom="6dp"
-            android:textStyle="bold"
+            android:text="주소"
             android:textColor="@color/black"
             android:textSize="18sp"
-            android:text="주소"/>
+            android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/editTextAddress"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:background="@drawable/rounded_gray_border"
-            android:hint="주소를 검색합니다"
-            android:inputType="textPostalAddress"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:textCursorDrawable="@drawable/cursor_color" />
-        <View
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/editTextBigCity"
+                android:layout_width="100dp"
+                android:layout_height="58dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_gray_border"
+                android:hint="도시"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:textCursorDrawable="@drawable/cursor_color" />
+            <View
+                android:layout_width="12dp"
+                android:layout_height="match_parent"/>
+
+            <EditText
+                android:id="@+id/editTextsmallCity"
+                android:layout_width="100dp"
+                android:layout_height="58dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_gray_border"
+                android:hint="시군구"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:textCursorDrawable="@drawable/cursor_color" />
+        </LinearLayout>
+
+    <View
             android:layout_width="match_parent"
             android:layout_height="21dp"/>
 
@@ -103,17 +127,17 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-<!--    <FrameLayout-->
-<!--        android:id="@+id/fragmentContainer"-->
+<!--&lt;!&ndash;    <FrameLayout&ndash;&gt;-->
+<!--&lt;!&ndash;        android:id="@+id/fragmentContainer"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_width="match_parent"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_height="match_parent"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:visibility="gone"/>&ndash;&gt;-->
+<!--    <WebView-->
+<!--        android:id="@+id/webView"-->
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="match_parent"-->
+<!--        android:layout_above="@id/mainLayout"-->
 <!--        android:visibility="gone"/>-->
-    <WebView
-        android:id="@+id/webView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/mainLayout"
-        android:visibility="gone"/>
 
 
 

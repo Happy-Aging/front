@@ -3,12 +3,15 @@ package com.example.happy_aging
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Typeface
+import android.net.http.SslError
+import android.os.Build
 import android.os.Bundle
 import android.os.Message
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.webkit.JavascriptInterface
+import android.webkit.SslErrorHandler
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
@@ -22,6 +25,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -39,7 +43,6 @@ class StartSurveyActivity : AppCompatActivity() {
 
     private lateinit var nameEditText: EditText
     private lateinit var addressEditText: EditText
-    private lateinit var webView: WebView
     private lateinit var userName: String
     private lateinit var addressResultLauncher: ActivityResultLauncher<Intent>
 
@@ -57,7 +60,6 @@ class StartSurveyActivity : AppCompatActivity() {
         setContentView(R.layout.activity_start_survey)
         setupToolbar()
         initializeViews()
-        setupWebView()
 
         addressResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -88,58 +90,14 @@ class StartSurveyActivity : AppCompatActivity() {
 
     private fun initializeViews() {
         nameEditText = findViewById(R.id.editTextName)
-        addressEditText = findViewById(R.id.editTextAddress)
-        webView = findViewById(R.id.webView)
+        addressEditText = findViewById(R.id.editTextBigCity)
         findViewById<Button>(R.id.buttonNext).setOnClickListener { handleNextButtonClick() }
-
 
         addressEditText.setOnClickListener {
             Log.d("SurveyStartResults", "AddressSearchActivity를 여는 인텐트 생성 및 실행")
-
             val intent = Intent(this, AddressSearchActivity::class.java)
             addressResultLauncher.launch(intent)
         }
-
-    }
-
-    private fun setupWebView() {
-        Log.d("SurveyStartResults", "Setting up WebView")
-
-        webView.settings.javaScriptEnabled = true
-        webView.addJavascriptInterface(object {
-            @JavascriptInterface
-            fun onAddressSelected(address: String) {
-                runOnUiThread {
-                    addressEditText.setText(address)
-                    webView.visibility = View.GONE
-                }
-            }
-        }, "Android")
-
-        webView.visibility = View.GONE
-        webView.webChromeClient = object : WebChromeClient() {
-            override fun onCreateWindow(view: WebView, isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message): Boolean {
-                val newWebView = WebView(view.context)
-                newWebView.webViewClient = WebViewClient()
-                newWebView.settings.javaScriptEnabled = true
-
-                val dialog = Dialog(view.context)
-                dialog.setContentView(newWebView)
-                dialog.show()
-
-                newWebView.webChromeClient = object : WebChromeClient() {
-                    override fun onCloseWindow(window: WebView) {
-                        dialog.dismiss()
-                    }
-                }
-
-                (resultMsg.obj as WebView.WebViewTransport).webView = newWebView
-                resultMsg.sendToTarget()
-
-                return true
-            }
-        }
-
     }
 
     private fun handleNextButtonClick() {
