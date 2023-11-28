@@ -1,7 +1,15 @@
 package com.example.happy_aging
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.graphics.Typeface
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
@@ -14,8 +22,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.google.android.filament.BuildConfig
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -31,6 +39,7 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.io.Serializable
 
+
 class ResultActivity : AppCompatActivity() {
 
     private lateinit var textViewUserName: TextView
@@ -40,9 +49,7 @@ class ResultActivity : AppCompatActivity() {
     private lateinit var buttonDownloadReport: Button
     private lateinit var progressBarDownload: ProgressBar
     private lateinit var imageViewRankIndicator: ImageView
-
-
-
+    
     private var savedPdfFilePath: String? = null
     private var userNameFixed: String? = null
 
@@ -63,8 +70,6 @@ class ResultActivity : AppCompatActivity() {
         initializeViews()
         loadDate()
         setupToolbar()
-
-
     }
 
     private fun initializeViews() {
@@ -177,35 +182,66 @@ class ResultActivity : AppCompatActivity() {
     private fun savePdfToFileSystem(body: ResponseBody) {
         try {
             val fileName = "${userNameFixed}_낙상위험도조사결과.pdf"
-            val filePath = getExternalFilesDir(null)?.absolutePath + File.separator + fileName
-            val file = File(filePath)
-            savedPdfFilePath = filePath
+
+            // '내 문서' 폴더에 파일을 저장합니다.
+            val documentsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+            val file = File(documentsDir, fileName)
+            updateDownloadPathLayout(documentsDir.toString())
 
             var inputStream: InputStream? = null
             var outputStream: OutputStream? = null
             try {
                 inputStream = body.byteStream()
                 outputStream = FileOutputStream(file)
-                val buffer = ByteArray(4096)
-                var bytesRead: Int
-                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-                    outputStream.write(buffer, 0, bytesRead)
-                }
-                updateDownloadPathLayout(filePath)
-                Toast.makeText(this, "보고서 파일이 다운 경로에 저장되었습니다", Toast.LENGTH_LONG).show()
+                inputStream.copyTo(outputStream)
+                Toast.makeText(this, "보고서가 '내 문서' 폴더에 저장되었습니다", Toast.LENGTH_LONG).show()
             } catch (e: IOException) {
-                e.printStackTrace()
+                Log.e("ResultActivity", "파일 저장 실패", e)
                 Toast.makeText(this, "파일 저장 실패: ${e.message}", Toast.LENGTH_SHORT).show()
             } finally {
                 inputStream?.close()
                 outputStream?.close()
             }
-        } catch (e: IOException) {
-            e.printStackTrace()
+        } catch (e: Exception) {
+            Log.e("ResultActivity", "파일 저장 중 오류 발생", e)
             Toast.makeText(this, "파일 저장 오류: ${e.message}", Toast.LENGTH_SHORT).show()
         }
-
     }
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance).apply {
+                description = CHANNEL_DESCRIPTION
+            }
+            val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+
+    private fun showDownloadNotification(progress: Int, isComplete: Boolean) {
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_download)
+            .setContentTitle("보고서 다운로드")
+            .setContentText(if (isComplete) "다운로드 완료" else "다운로드 중...")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setProgress(100, progress, false)
+
+        if (isComplete) {
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse("file_path_here") // 다운로드한 파일의 경로
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+            val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+            builder.setContentIntent(pendingIntent)
+            builder.setAutoCancel(true) // 사용자가 알림을 탭하면 자동으로 알림이 사라집니다.
+        }
+
+        val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(NOTIFICATION_ID, builder.build())
+    }
+
+
     interface ApiService {
         @GET("/survey/{resultId}/download")
         fun downloadReport(@Path("resultId") resultId: Long): Call<ResponseBody>
@@ -216,6 +252,14 @@ class ResultActivity : AppCompatActivity() {
         val rank: Int,
         val summary: String
     ) : Serializable
+
+    companion object {
+        private const val NOTIFICATION_ID = 1
+        private const val CHANNEL_ID = "download_notification_channel"
+        private const val CHANNEL_NAME = "Download Notifications"
+        private const val CHANNEL_DESCRIPTION = "Notifications for download progress"
+    }
+
 
 
 

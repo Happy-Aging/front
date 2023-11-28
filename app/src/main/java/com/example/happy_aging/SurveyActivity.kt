@@ -1,27 +1,13 @@
 package com.example.happy_aging
 
-import android.app.AlertDialog
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.POST
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import okhttp3.ResponseBody
-import okhttp3.RequestBody
 
+import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.app.Dialog
-import android.graphics.Color
-import android.os.Parcelable
-import android.util.TypedValue
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -29,12 +15,17 @@ import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
-import java.io.Serializable
-
-
+import okhttp3.RequestBody
 import org.json.JSONArray
-import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
+import retrofit2.http.POST
 import retrofit2.http.Path
+import java.io.Serializable
 import java.util.concurrent.TimeUnit
 
 
@@ -57,9 +48,9 @@ class SurveyActivity : AppCompatActivity() {
     private var seniorId = 0
     private val apiService: ApiService by lazy {
         val okHttpClient = OkHttpClient.Builder()
-            .connectTimeout(600, TimeUnit.SECONDS) // 연결 타임아웃 설정
-            .readTimeout(600, TimeUnit.SECONDS) // 읽기 타임아웃 설정
-            .writeTimeout(600, TimeUnit.SECONDS) // 쓰기 타임아웃 설정
+            .connectTimeout(120, TimeUnit.SECONDS) // 연결 타임아웃 설정
+            .readTimeout(120, TimeUnit.SECONDS) // 읽기 타임아웃 설정
+            .writeTimeout(120, TimeUnit.SECONDS) // 쓰기 타임아웃 설정
             .build()
 
         // Retrofit 인스턴스 생성
@@ -85,9 +76,8 @@ class SurveyActivity : AppCompatActivity() {
         layoutAnswerOptions = findViewById(R.id.layoutAnswerOptions)
         buttonNext = findViewById(R.id.buttonNext)
         numberPicker = findViewById(R.id.numberPicker)
-        numberPicker.minValue = 1900
-        numberPicker.maxValue = 2050
 
+        setNumberPicker()
         setupToolbar()
         loadQuestions()
         displayQuestion(currentQuestionIndex)
@@ -115,6 +105,24 @@ class SurveyActivity : AppCompatActivity() {
 
 
     }
+
+    private fun setNumberPicker() {
+        val totalYears = 1962 - 1922 + 1 // 1922부터 1962까지의 연도 수
+
+        val values = arrayOfNulls<String>(totalYears + 2) // 두 개의 추가 문자열을 위한 공간
+
+        values[0] = "1922년 이전"
+        for (i in 1..totalYears) {
+            values[i] = Integer.toString(1921 + i) // 1922부터 1962까지
+        }
+        values[values.size - 1] = "1962년 이후"
+
+        numberPicker.minValue = 1
+        numberPicker.maxValue = values.size
+        numberPicker.displayedValues = values
+        numberPicker.wrapSelectorWheel = false
+    }
+
     private fun isAnswerProvided(): Boolean {
 
         try {
@@ -224,7 +232,7 @@ private fun addRadioButtons(options: JSONArray) {
         val radioButton = RadioButton(this)
         radioButton.text = options.getString(i)
         radioButton.textSize = 18f        // 기본 라디오 버튼 스타일 사용
-        layoutParams.setMargins(0, 8, 0, 8) // 상단과 하단 마진 설정
+        layoutParams.setMargins(0, 4, 0, 4) // 상단과 하단 마진 설정
         radioButton.layoutParams = layoutParams
         radioGroup.addView(radioButton)
     }
@@ -307,6 +315,8 @@ private fun addRadioButtons(options: JSONArray) {
                     } ?: showErrorDialog("서버에서 유효한 응답을 받지 못했습니다.")
                 } else {
                     showErrorDialog("서버 오류: ${response.message()}")
+                    handleErrorResponse(response)
+
                 }
             }
 
@@ -318,12 +328,28 @@ private fun addRadioButtons(options: JSONArray) {
         })
     }
 
-    private fun showErrorDialog(message: String) {
-        AlertDialog.Builder(this).apply {
-            setMessage(message)
-            setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
-            create().show()
+    private fun showErrorDialog(errorMessage: String) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("오류")
+        builder.setMessage("서버에 문제가 발생했습니다.\n$errorMessage")
+
+        // 다시 시도하기 버튼
+        builder.setPositiveButton("다시 시도하기") { dialog, _ ->
+            dialog.dismiss()
+            submitResponsesToServer() // 사용자가 다시 시도하기를 선택하면 서버에 제출을 재시도합니다.
         }
+
+        // 끝내기 버튼
+        builder.setNegativeButton("끝내기") { dialog, _ ->
+            dialog.dismiss()
+            finish() // 사용자가 끝내기를 선택하면 액티비티를 종료합니다.
+        }
+
+        val dialog = builder.create()
+        dialog.show()
+
+        // '끝내기' 버튼의 색상을 DarkGray로 설정합니다.
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(this, R.color.DarkGray))
     }
 
 
