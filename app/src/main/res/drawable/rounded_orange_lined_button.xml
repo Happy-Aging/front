@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 내부 색상을 흰색으로 설정 -->
+
+    <!-- 테두리를 오렌지색으로 설정, 두께는 원하는 크기로 조절 가능 -->
+    <stroke android:width="2dp" android:color="@color/main_orange" />
+
+    <!-- 모서리 둥근 정도 설정 -->
+    <corners android:radius="10dp" />
+</shape>

@@ -142,7 +142,7 @@ class SurveyActivity : AppCompatActivity() {
                     isRadioButtonChecked
                 }
                 "NUMBER" -> {
-                    numberPicker.value != numberPicker.minValue // 넘버 피커의 값이 초기값이 아닌지 확인
+                    numberPicker.value != numberPicker.minValue-1 // 넘버 피커의 값이 초기값이 아닌지 확인
                 }
                 else -> false
             }
@@ -246,7 +246,7 @@ private fun addRadioButtons(options: JSONArray) {
         val answerType = question.getString("answerType")
 
         val response: String = when (answerType) {
-            "NUMBER" -> numberPicker.value.toString()
+            "NUMBER" -> getNumberPickerValueAsString()
             "SINGLE_CHOICE" -> getSelectedRadioButtonResponse()
             else -> ""
         }
@@ -257,6 +257,18 @@ private fun addRadioButtons(options: JSONArray) {
     private fun getSelectedRadioButtonResponse(): String {
         val radioGroup = layoutAnswerOptions.getChildAt(0) as RadioGroup
         return findViewById<RadioButton>(radioGroup.checkedRadioButtonId)?.text.toString()
+    }
+    private fun getNumberPickerValueAsString(): String {
+        val totalYears = 1962 - 1922 + 1
+        val values = arrayOfNulls<String>(totalYears + 2)
+
+        values[0] = "1922년 이전"
+        for (i in 1..totalYears) {
+            values[i] = Integer.toString(1921 + i)
+        }
+        values[values.size - 1] = "1962년 이후"
+
+        return values[numberPicker.value - 1] ?: "" // numberPicker.value는 minValue부터 시작하므로 -1을 해서 인덱스와 일치시킵니다.
     }
 
     private fun areAllQuestionsAnswered(): Boolean = userResponses.size == questions.length()
@@ -303,7 +315,11 @@ private fun addRadioButtons(options: JSONArray) {
             ResponseDTO(questionNumber, response)
         }
         val surveyResultsRequest = SurveyResultsRequest(responseDTOs)
+        Log.d("SurveyActivity", "surveyResultsRequest-> ${surveyResultsRequest.toString()}")
+
         val requestBody = Gson().toJson(surveyResultsRequest).toRequestBody()
+        Log.d("SurveyActivity", "requestBody-> ${requestBody.toString()}")
+
 
         apiService.submitSurveyResults(seniorId, requestBody).enqueue(object : Callback<SurveyResultsResponse> {
             override fun onResponse(call: Call<SurveyResultsResponse>, response: Response<SurveyResultsResponse>) {

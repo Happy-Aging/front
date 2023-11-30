@@ -262,7 +262,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:visibility="gone"
-                android:layout_marginBottom="21dp">
+                android:paddingBottom="3dp">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -276,10 +276,18 @@
                     android:id="@+id/textDownPath"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dp"
                     android:text="PDF"
                     android:textSize="18sp"
                     android:textColor="@color/DarkGray"
                     />
+                <Button
+                android:id="@+id/buttonGoReport"
+                android:background="@drawable/rounded_orange_lined_button"
+                android:textColor="@color/main_orange"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="보고서 바로 보기"/>
             </LinearLayout>
             <View
                 android:layout_width="match_parent"

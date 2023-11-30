@@ -24,6 +24,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import com.google.android.filament.BuildConfig
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -47,10 +49,10 @@ class ResultActivity : AppCompatActivity() {
     private lateinit var textDate: TextView
     private lateinit var textRank: TextView
     private lateinit var buttonDownloadReport: Button
+    private lateinit var buttonGoReport: Button
     private lateinit var progressBarDownload: ProgressBar
     private lateinit var imageViewRankIndicator: ImageView
     
-    private var savedPdfFilePath: String? = null
     private var userNameFixed: String? = null
 
     private val baseUrl = "http://13.125.35.235:8080/"
@@ -78,6 +80,7 @@ class ResultActivity : AppCompatActivity() {
         textRank = findViewById(R.id.textRank)
         textSurveyResult = findViewById(R.id.textSurveyResult)
         buttonDownloadReport = findViewById(R.id.buttonDownloadReport)
+        buttonGoReport = findViewById(R.id.buttonGoReport)
         imageViewRankIndicator = findViewById(R.id.imageViewRankIndicator)
         progressBarDownload = findViewById<ProgressBar>(R.id.progressBarDownload)
     }
@@ -102,27 +105,7 @@ class ResultActivity : AppCompatActivity() {
             if (resultId != "-1") downloadReport(resultId.toLong())
             else Toast.makeText(this, "결과 ID를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
         }
-
-
-//        buttonViewPdfWeb.setOnClickListener { openPdfInWebBrowser() }
     }
-
-//    private fun openPdfInWebBrowser() {
-//        Log.d("ResultActivity", "openPdfInWebBrowser 실행")
-//
-//        savedPdfFilePath?.let { filePath ->
-//            val fileUri = FileProvider.getUriForFile(
-//                this,
-//                "${BuildConfig.APPLICATION_ID}.provider",
-//                File(filePath)
-//            )
-//            val intent = Intent(Intent.ACTION_VIEW).apply {
-//                setDataAndType(fileUri, "application/pdf")
-//                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-//            }
-//            startActivity(intent)
-//        } ?: Toast.makeText(this, "PDF 파일이 아직 다운로드되지 않았습니다.", Toast.LENGTH_SHORT).show()
-//    }
 
     private fun setupToolbar() {
         val customToolbar: View = layoutInflater.inflate(R.layout.toolbar_title, null)
@@ -187,6 +170,8 @@ class ResultActivity : AppCompatActivity() {
             val documentsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
             val file = File(documentsDir, fileName)
             updateDownloadPathLayout(documentsDir.toString())
+            Log.e("ResultActivity", "파일 다운 경로 -> $documentsDir")
+
 
             var inputStream: InputStream? = null
             var outputStream: OutputStream? = null
@@ -194,6 +179,12 @@ class ResultActivity : AppCompatActivity() {
                 inputStream = body.byteStream()
                 outputStream = FileOutputStream(file)
                 inputStream.copyTo(outputStream)
+
+                buttonGoReport.setOnClickListener {
+                    openPdfFile(file)
+                }
+
+                showDownloadCompleteNotification(this@ResultActivity, file) // 수정된 부분
                 Toast.makeText(this, "보고서가 '내 문서' 폴더에 저장되었습니다", Toast.LENGTH_LONG).show()
             } catch (e: IOException) {
                 Log.e("ResultActivity", "파일 저장 실패", e)
@@ -207,38 +198,44 @@ class ResultActivity : AppCompatActivity() {
             Toast.makeText(this, "파일 저장 오류: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance).apply {
-                description = CHANNEL_DESCRIPTION
-            }
-            val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+    private fun openPdfFile(file: File) {
+        val fileUri = FileProvider.getUriForFile(this, "${packageName}.provider", file)
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(fileUri, "application/pdf")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
+        startActivity(intent)
     }
 
+    fun showDownloadCompleteNotification(context: Context, file: File) {
+        val fileUri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.provider",
+            file
+        )
 
-    private fun showDownloadNotification(progress: Int, isComplete: Boolean) {
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_download)
-            .setContentTitle("보고서 다운로드")
-            .setContentText(if (isComplete) "다운로드 완료" else "다운로드 중...")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setProgress(100, progress, false)
-
-        if (isComplete) {
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse("file_path_here") // 다운로드한 파일의 경로
-                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            }
-            val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
-            builder.setContentIntent(pendingIntent)
-            builder.setAutoCancel(true) // 사용자가 알림을 탭하면 자동으로 알림이 사라집니다.
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(fileUri, "application/pdf")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
 
-        val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(NOTIFICATION_ID, builder.build())
+        val pendingIntentFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PendingIntent.FLAG_IMMUTABLE
+        } else {
+            0 // 이전 버전에서는 플래그가 필요하지 않습니다.
+        }
+
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent, pendingIntentFlags)
+
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationBuilder = NotificationCompat.Builder(context, "download_channel_id")
+            .setContentTitle("다운로드 완료")
+            .setContentText("PDF 파일이 다운로드 되었습니다. 탭하여 열기")
+            .setSmallIcon(android.R.drawable.stat_sys_download_done)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+
+        notificationManager.notify(0, notificationBuilder.build())
     }
 
 
@@ -246,12 +243,6 @@ class ResultActivity : AppCompatActivity() {
         @GET("/survey/{resultId}/download")
         fun downloadReport(@Path("resultId") resultId: Long): Call<ResponseBody>
     }
-    data class SurveyResultsResponse(
-        val resultId: Long,
-        val date: String,
-        val rank: Int,
-        val summary: String
-    ) : Serializable
 
     companion object {
         private const val NOTIFICATION_ID = 1

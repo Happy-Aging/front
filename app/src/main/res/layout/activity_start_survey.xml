@@ -54,14 +54,6 @@
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_marginBottom="6dp"
-            android:text="어르신 성함을 작성하세요"
-            android:textColor="@color/DarkGray"
-            android:textSize="15sp" />
 
         <EditText
             android:id="@+id/editTextName"

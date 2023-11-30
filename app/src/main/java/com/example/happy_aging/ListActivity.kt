@@ -11,6 +11,8 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import android.app.AlertDialog
+
 
 class ListActivity : AppCompatActivity(), ItemAdapter.OnItemClickListener {
 
@@ -23,6 +25,7 @@ class ListActivity : AppCompatActivity(), ItemAdapter.OnItemClickListener {
         setContentView(R.layout.activity_list)
         setupToolbar()
 
+
         items = listOf(
             Item("실버카 성인용 보행기", "item1", R.drawable.img_car_walker),
             Item("전동식 의료용 침대", "item2",R.drawable.img_bed),
@@ -30,13 +33,22 @@ class ListActivity : AppCompatActivity(), ItemAdapter.OnItemClickListener {
             Item("복지용구 목욕의자", "item4",R.drawable.img_chair)
         )
 
+
         recyclerView = findViewById(R.id.recycler_view)
         itemAdapter = ItemAdapter(items, this)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = itemAdapter
     }
-
+//    private fun showInstructionDialog() {
+//        AlertDialog.Builder(this)
+//            .setTitle("유의사항")
+//            .setMessage("- 평평한 곳에 카메라를 2~5초 비추세요.\n\n- 화면에 흰 점들이 나타나면 화면을 터치하세요.")
+//            .setPositiveButton("확인 완료") { dialog, _ ->
+//                dialog.dismiss()
+//            }
+//            .show()
+//    }
     private fun setupToolbar() {
         val customToolbar: View = layoutInflater.inflate(R.layout.toolbar_title, null)
         customToolbar.findViewById<ImageView>(R.id.back_button).setOnClickListener { finish() }
