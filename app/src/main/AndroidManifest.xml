@@ -32,7 +32,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/title_activity_splash_screen"
+            android:label="해피에이징"
             android:theme="@style/Theme.Happy_aging">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

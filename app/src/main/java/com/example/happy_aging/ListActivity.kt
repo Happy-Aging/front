@@ -11,7 +11,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.app.AlertDialog
 
 
 class ListActivity : AppCompatActivity(), ItemAdapter.OnItemClickListener {
@@ -40,15 +39,7 @@ class ListActivity : AppCompatActivity(), ItemAdapter.OnItemClickListener {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = itemAdapter
     }
-//    private fun showInstructionDialog() {
-//        AlertDialog.Builder(this)
-//            .setTitle("유의사항")
-//            .setMessage("- 평평한 곳에 카메라를 2~5초 비추세요.\n\n- 화면에 흰 점들이 나타나면 화면을 터치하세요.")
-//            .setPositiveButton("확인 완료") { dialog, _ ->
-//                dialog.dismiss()
-//            }
-//            .show()
-//    }
+
     private fun setupToolbar() {
         val customToolbar: View = layoutInflater.inflate(R.layout.toolbar_title, null)
         customToolbar.findViewById<ImageView>(R.id.back_button).setOnClickListener { finish() }
