@@ -1,14 +1,16 @@
+import io.netty.util.ReferenceCountUtil.release
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 }
 
 android {
-    namespace = "com.example.happy_aging"
+    namespace = "com.appname.happyAging"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.happy_aging"
+        applicationId = "com.appname.happyAging"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -20,15 +22,24 @@ android {
         }
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+    signingConfigs {
+        create("release") {
+            keyAlias = "key0"
+            keyPassword = "happyAging"
+            storeFile = file("/Users/mbp/happy_aging/path/Untitled")
+            storePassword = "happyAging"
         }
     }
+
+    buildTypes {
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
+
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
